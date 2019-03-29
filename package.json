@@ -1,0 +1,197 @@
+{
+  "name": "managed-instance-dashboard",
+  "displayName": "Managed Instance",
+  "description": "Managed Instance Dashboard",
+  "version": "0.1.0",
+  "publisher": "jocapc",
+  "preview": true,
+  "engines": {
+    "vscode": "^1.26.0",
+    "azdata": "*"
+  },
+  "icon": "images/sqlserver.png",
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "repository": "https://github.com/Microsoft/azuredatastudio",
+  "categories": [
+    "Other"
+  ],
+  "contributes": {
+    "configuration": [],
+    "commands": [],
+    "views": {},
+    "menus": {},
+    "dashboard.tabs": [
+      {
+        "id": "Managed-Instance",
+        "title": "Managed Instance",
+        "description": "This extension shows useful reports for an Azure SQL Database Managed Instance.",
+        "container": {
+          "nav-section": [
+            {
+              "id": "managed-instance-monitoring",
+              "title": "Monitor",
+              "icon": {
+                "light": "./src/media/monitor.svg",
+                "dark": "./src/media/monitor_inverse.svg"
+              },
+              "container": {
+                "managed-instance-monitoring-container": {}
+              }
+            },
+            {
+              "id": "managed-instance-health",
+              "title": "Health",
+              "icon": {
+                "light": "./src/media/health.svg",
+                "dark": "./src/media/health_inverse.svg"
+              },
+              "container": {
+                "managed-instance-health-container": {}
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "dashboard.insights": [
+      {
+        "id": "mi-properties",
+        "contrib": {
+          "type": {
+            "count": {
+              "dataDirection": "horizontal",
+              "columnsAsLabels": false,
+              "labelFirstColumn": false,
+              "legendPosition": "top"
+            }
+          },
+          "queryFile": "./src/sql/properties.sql"
+        }
+      },
+      {
+        "id": "mi-resource-usage",
+        "contrib": {
+          "type": {
+            "line": {
+              "dataDirection": "vertical",
+              "columnsAsLabels": true,
+              "labelFirstColumn": true,
+              "legendPosition": "top",
+              "xAxisLabel": "Time",
+              "yAxisLabel": "%",
+              "dataType": "number"
+            }
+          },
+          "queryFile": "./src/sql/resource-usage.sql"
+        }
+      },
+      {
+        "id": "mi-storage-usage",
+        "contrib": {
+          "type": {
+            "table": {
+              "dataDirection": "horizontal",
+              "columnsAsLabels": false,
+              "labelFirstColumn": false,
+              "legendPosition": "top"
+            }
+          },
+          "queryFile": "./src/sql/storage-usage.sql"
+        }
+      },
+      {
+        "id": "mi-nodes",
+        "contrib": {
+          "type": {
+            "table": {
+              "dataDirection": "horizontal",
+              "columnsAsLabels": false,
+              "labelFirstColumn": false,
+              "legendPosition": "top"
+            }
+          },
+          "queryFile": "./src/sql/nodes.sql"
+        }
+      }
+    ],
+    "dashboard.containers": [
+      {
+        "id": "managed-instance-monitoring-container",
+        "container": {
+          "widgets-container": [
+            {
+              "name": "Properties",
+              "gridItemConfig": {
+                "sizex": 1,
+                "sizey": 1
+              },
+              "widget": {
+                "mi-properties": {}
+              }
+            },
+            {
+              "name": "Storage usage",
+              "gridItemConfig": {
+                "sizex": 2,
+                "sizey": 1
+              },
+              "widget": {
+                "mi-storage-usage": {}
+              }
+            },
+            {
+              "name": "Resource usage",
+              "gridItemConfig": {
+                "sizex": 3,
+                "sizey": 1
+              },
+              "widget": {
+                "mi-resource-usage": {}
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "managed-instance-health-container",
+        "container": {
+          "widgets-container": [
+            {
+              "name": "Database replicas",
+              "gridItemConfig": {
+                "sizex": 4,
+                "sizey": 3
+              },
+              "widget": {
+                "mi-nodes": {}
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "snippets": []
+  },
+  "scripts": {
+    "build": "gulp build",
+    "compile": "gulp compile",
+    "watch": "gulp watch",
+    "postinstall": "node ./node_modules/vscode/bin/install"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "child-process-promise": "^2.2.1",
+    "del": "^3.0.0",
+    "gulp": "^4.0.0",
+    "gulp-color": "0.0.1",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-tslint": "^6.0.2",
+    "gulp-typescript": "^3.2.4",
+    "should": "^13.2.1",
+    "tslint": "^3.14.0",
+    "typemoq": "^2.1.0",
+    "typescript": "^2.6.1",
+    "vsce": "1.36.2",
+    "vscode": "^1.1.6"
+  }
+}
