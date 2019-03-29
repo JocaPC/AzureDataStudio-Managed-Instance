@@ -8,4 +8,5 @@ Here is a list of some of the available reports.
 * CPU/storage usage
 * Status of database replicas
 
-<img src="./images/managed_instance.png" alt="Managed Instance" style="width:480px;"/>
+<img src="https://github.com/JocaPC/AzureDataStudio-Managed-Instance/blob/master/images/managed_instance.png" alt="Managed Instance" style="width:480px;"/>
+
