@@ -1,7 +1,7 @@
 select
     [Cores] = virtual_core_count, 
     [Memory] = CASE 
-    WHEN service_tier = 'GeneralPurpose' THEN CONCAT(7 * virtual_core_count, ' GB')
+    WHEN hardware_generation = 'Gen4' THEN CONCAT(7 * virtual_core_count, ' GB')
     ELSE CONCAT(5.1 * virtual_core_count, ' GB')
     END,
     [Max storage] = CONCAT(max_storage_gb , ' GB'),
