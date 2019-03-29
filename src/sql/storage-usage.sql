@@ -23,7 +23,7 @@ FROM
     WHERE physical_name LIKE 'https:%'
 ) AS alloc(size_tb)),
 volumes as (
-SELECT	Storage = CASE WHEN volume_mount_point = 'http://' THEN 'Azure Premium Disk'
+SELECT	Storage = CASE WHEN volume_mount_point = 'http://' THEN 'Remote storage'
                         ELSE 'Local SSD'
                     END,
 		[Used GB] = CAST(MIN(total_bytes / 1024. / 1024 / 1024) AS NUMERIC(8,1)),
