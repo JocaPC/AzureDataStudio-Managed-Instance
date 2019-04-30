@@ -9,7 +9,7 @@
     "vscode": "^1.26.0",
     "azdata": "*"
   },
-  "icon": "https://raw.githubusercontent.com/JocaPC/AzureDataStudio-Managed-Instance/master/images/ManagedInstanceLogo.png",
+  "icon": "images/ManagedInstanceLogo.png",
   "license": "SEE LICENSE IN LICENSE.txt",
   "repository": "https://github.com/JocaPC/AzureDataStudio-Managed-Instance",
   "categories": [
