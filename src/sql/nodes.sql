@@ -1,3 +1,4 @@
+IF( SERVERPROPERTY('EngineEdition') = 8 )
 with nodes as (
 	select db_name = DB_NAME(database_id),
 		minlsn = CONVERT(NUMERIC(38,0), ISNULL(truncation_lsn, 0)),

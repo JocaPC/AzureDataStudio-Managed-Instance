@@ -1,3 +1,4 @@
+IF( SERVERPROPERTY('EngineEdition') = 8 )
 select
     [Cores] = virtual_core_count, 
     [Memory] = CASE 
@@ -7,7 +8,7 @@ select
     [Max storage] = CONCAT(max_storage_gb , ' GB'),
     [Service tier] = service_tier,
     [Hardware generation] = hardware_generation, 
-	[Log rate] = 
+	[Log rate(max)] = 
     CASE 
     WHEN service_tier = 'GeneralPurpose' THEN CONCAT(22, ' MB/s')
     WHEN service_tier = 'BusinessCritical' AND virtual_core_count <= 48/3 THEN CONCAT(virtual_core_count *3, ' MB/s')
@@ -32,4 +33,5 @@ FROM sys.dm_os_sys_info
 
 	, (select top 1 service_tier = sku, virtual_core_count, hardware_generation, max_storage_gb = reserved_storage_mb/1024
 	from master.sys.server_resource_stats
-	where start_time > DATEADD(mi, -7, GETUTCDATE())) as srs
+	where start_time > DATEADD(mi, -7, GETUTCDATE())
+    order by start_time desc) as srs

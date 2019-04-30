@@ -1,3 +1,4 @@
+IF( SERVERPROPERTY('EngineEdition') = 8 )
 WITH allocated ([Remaining files])
 AS (
 SELECT  --[Allocated TB] = CONCAT(CAST(size_tb as [tinyint]), 'TB out of 35TB'),
