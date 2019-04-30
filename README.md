@@ -1,6 +1,6 @@
 # Managed Instance dashboard for Azure Data Studio
 
-Welcome to **Managed Instance** dashboard for Azure Data Studio! Managed Instance gives useful insights about the Azure SQL Database Managed Instance related to performance. 
+Welcome to **Managed Instance** dashboard for Azure Data Studio! Managed Instance dashboard provides useful insights about the Azure SQL Database Managed Instance related to performance and health of the instance. 
 Here is a list of some of the available reports.
 
 * Managed Instance properties

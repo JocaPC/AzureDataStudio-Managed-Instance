@@ -36,5 +36,5 @@ GROUP BY volume_mount_point)
 SELECT *
 FROM volumes
     left join allocated
-        on volumes.Storage = 'Azure Premium Disk'
+        on volumes.Storage = 'Remote storage'
 ;
