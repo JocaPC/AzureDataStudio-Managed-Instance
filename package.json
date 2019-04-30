@@ -2,12 +2,13 @@
   "name": "managed-instance-dashboard",
   "displayName": "Managed Instance Dashboard",
   "description": "Managed Instance Dashboard",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "jocapc",
   "preview": true,
   "engines": {
     "vscode": "^1.26.0",
-    "azdata": "*"
+    "azdata": "*",
+    "sqlops": "*"
   },
   "icon": "images/ManagedInstanceLogo.png",
   "license": "SEE LICENSE IN LICENSE.txt",
