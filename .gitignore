@@ -1,8 +1,8 @@
-
+.vs
+.vscode
 out
 node_modules
 .vscode-test/
-*.vsix
 .DS_Store
 .idea
 test-reports/**
