@@ -3,15 +3,15 @@
   "displayName": "Managed Instance Dashboard",
   "description": "Managed Instance Dashboard",
   "version": "0.1.0",
-  "publisher": "Jovan Popovic",
+  "publisher": "jocapc",
   "preview": true,
   "engines": {
     "vscode": "^1.26.0",
     "azdata": "*"
   },
-  "icon": "https://github.com/JocaPC/AzureDataStudio-Managed-Instance/blob/master/images/sqlserver.png",
+  "icon": "https://raw.githubusercontent.com/JocaPC/AzureDataStudio-Managed-Instance/master/images/ManagedInstanceLogo.png",
   "license": "SEE LICENSE IN LICENSE.txt",
-  "repository": "https://github.com/JocaPC/AzureDataStudio-Managed-Instance/blob/master/images/sqlserver.png",
+  "repository": "https://github.com/JocaPC/AzureDataStudio-Managed-Instance",
   "categories": [
     "Other"
   ],
