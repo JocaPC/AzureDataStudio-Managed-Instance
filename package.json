@@ -2,7 +2,7 @@
   "name": "managed-instance-dashboard",
   "displayName": "Managed Instance Dashboard",
   "description": "Managed Instance Dashboard",
-  "version": "0.1.1",
+  "version": "0.2.8",
   "publisher": "jocapc",
   "preview": true,
   "engines": {
@@ -37,6 +37,17 @@
               },
               "container": {
                 "managed-instance-monitoring-container": {}
+              }
+            },
+            {
+              "id": "managed-instance-recommendations",
+              "title": "Recommendations",
+              "icon": {
+                "light": "./src/media/support.svg",
+                "dark": "./src/media/support_inverse.svg"
+              },
+              "container": {
+                "managed-instance-recommendations-container": {}
               }
             },
             {
@@ -113,6 +124,20 @@
           },
           "queryFile": "./src/sql/nodes.sql"
         }
+      },
+      {
+        "id": "mi-recommendations",
+        "contrib": {
+          "type": {
+            "table": {
+              "dataDirection": "horizontal",
+              "columnsAsLabels": false,
+              "labelFirstColumn": false,
+              "legendPosition": "top"
+            }
+          },
+          "queryFile": "./src/sql/recommendations.sql"
+        }
       }
     ],
     "dashboard.containers": [
@@ -133,7 +158,7 @@
             {
               "name": "Storage usage",
               "gridItemConfig": {
-                "sizex": 2,
+                "sizex": 1,
                 "sizey": 1
               },
               "widget": {
@@ -165,6 +190,23 @@
               },
               "widget": {
                 "mi-nodes": {}
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "managed-instance-recommendations-container",
+        "container": {
+          "widgets-container": [
+            {
+              "name": "Recommendations",
+              "gridItemConfig": {
+                "sizex": 4,
+                "sizey": 3
+              },
+              "widget": {
+                "mi-recommendations": {}
               }
             }
           ]

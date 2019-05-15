@@ -40,7 +40,7 @@ select
 SELECT
 	[Database] = db_name,
 	[Is primary] = is_primary_replica,
-	[Endpoint] = replication_endpoint_url,
+	[Endpoint] = SUBSTRING(replication_endpoint_url, 1, 17),
 	[Sync progress] = CASE WHEN internal_state_desc IS NOT NULL -- Check for active seeding
                            THEN 'Seeding'
                      WHEN logprogresssize_p > 0
@@ -48,6 +48,8 @@ SELECT
                      ELSE 'Select the Primary Node' END,
 	[Is local] = is_local,
 	state = synchronization_state_desc,
-	[Lag (sec)] = secondary_lag_seconds
+	[Lag (sec)] = secondary_lag_seconds,
+	[Send rate (kbps)] = log_send_rate,
+	[Redo rate (kbps)] = redo_rate
 	FROM nodes_progress_size
 ORDER BY db_name ASC, is_primary_replica DESC;
