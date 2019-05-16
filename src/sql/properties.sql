@@ -11,7 +11,7 @@ select
 	[Log rate(max)] = 
     CASE 
     WHEN service_tier = 'GeneralPurpose' THEN CONCAT(22, ' MB/s')
-    WHEN service_tier = 'BusinessCritical' AND virtual_core_count <= 48/3 THEN CONCAT(virtual_core_count *3, ' MB/s')
+    WHEN service_tier = 'BusinessCritical' AND virtual_core_count <= 48/4 THEN CONCAT(virtual_core_count *4, ' MB/s')
     ELSE '48 MB/s'
     END,
     [Data rate] = 

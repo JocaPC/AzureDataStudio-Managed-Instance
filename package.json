@@ -2,7 +2,7 @@
   "name": "managed-instance-dashboard",
   "displayName": "Managed Instance Dashboard",
   "description": "Managed Instance Dashboard",
-  "version": "0.2.8",
+  "version": "0.3.0",
   "publisher": "jocapc",
   "preview": true,
   "engines": {
@@ -25,7 +25,7 @@
       {
         "id": "Managed-Instance",
         "title": "Managed Instance",
-        "description": "This extension shows useful reports for an Azure SQL Database Managed Instance.",
+        "description": "This extension shows useful reports for Azure SQL Database Managed Instance.",
         "container": {
           "nav-section": [
             {
