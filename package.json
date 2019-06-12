@@ -2,7 +2,7 @@
   "name": "managed-instance-dashboard",
   "displayName": "Managed Instance Dashboard",
   "description": "Managed Instance Dashboard",
-  "version": "0.3.1",
+  "version": "0.3.3",
   "publisher": "Microsoft",
   "preview": true,
   "engines": {
@@ -98,17 +98,31 @@
         }
       },
       {
-        "id": "mi-storage-usage",
+        "id": "mi-storage-usage-ssd",
         "contrib": {
           "type": {
-            "table": {
+            "count": {
               "dataDirection": "horizontal",
               "columnsAsLabels": false,
               "labelFirstColumn": false,
               "legendPosition": "top"
             }
           },
-          "queryFile": "./src/sql/storage-usage.sql"
+          "queryFile": "./src/sql/storage-usage-ssd.sql"
+        }
+      },
+      {
+        "id": "mi-storage-usage-azure",
+        "contrib": {
+          "type": {
+            "count": {
+              "dataDirection": "horizontal",
+              "columnsAsLabels": false,
+              "labelFirstColumn": false,
+              "legendPosition": "top"
+            }
+          },
+          "queryFile": "./src/sql/storage-usage-azure.sql"
         }
       },
       {
@@ -156,13 +170,23 @@
               }
             },
             {
-              "name": "Storage usage",
+              "name": "Local storage",
               "gridItemConfig": {
-                "sizex": 2,
+                "sizex": 1,
                 "sizey": 1
               },
               "widget": {
-                "mi-storage-usage": {}
+                "mi-storage-usage-ssd": {}
+              }
+            },
+            {
+              "name": "Remote storage",
+              "gridItemConfig": {
+                "sizex": 1,
+                "sizey": 1
+              },
+              "widget": {
+                "mi-storage-usage-azure": {}
               }
             },
             {
