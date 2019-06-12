@@ -6,7 +6,7 @@ BEGIN;
 WITH a as (
 SELECT
 name = 'HIGH_VLF_COUNT',
-reason = CAST(count(*) AS VARCHAR(6)) + ' VLF in ' + name + ' file',
+reason = CAST(count(*) AS VARCHAR(6)) + ' VLF in "' + name + '" log file',
 score = CAST(1-EXP(-count(*)/100.) AS NUMERIC(6,2))*100,
 [state] = 'Mitigate' COLLATE Latin1_General_100_CI_AS,
 script = CONCAT("USE [", DB_NAME(mf.database_id),"];DBCC SHRINKFILE (N'",name,"', 1, TRUNCATEONLY);"),
@@ -21,11 +21,11 @@ select	name = 'MEMORY_PRESSURE',
 		reason = CONCAT('Page life expectancy ', v.cntr_value,
 						' lower than ', (((l.cntr_value*8/1024)/1024)/4)*300,
 						' on ', RTRIM(v.object_name))
-		, score = 100*(1 - EXP (
+		, score = ROUND(100*(1 - EXP (
 			- CASE WHEN l.cntr_value > 0
 				THEN (((l.cntr_value*8./1024)/1024)/4)*300 
 				ELSE 0
-			END / v.cntr_value ))
+			END / v.cntr_value )),0)
 		, state = 'Investigate' COLLATE Latin1_General_100_CI_AS
 		, script = 'N/A: Add more memory or find the queries that use most of memory.'
 		, details = 'Check PAGEIOLATCH wait statistics to verify is the problem in memory usage.'
@@ -83,21 +83,29 @@ WHERE used_gb/total_gb > .8
 UNION ALL
 SELECT name = 'STORAGE_LIMIT',
 		reason = 'Reaching storage size limit on instance',
-		score = 100*storage_usage_perc*storage_usage_perc,
+		score = ROUND(100*storage_usage_perc*storage_usage_perc,0),
 		[state] = 'Mitigate' COLLATE Latin1_General_100_CI_AS,
 		script = 'Use the Azure portal, PowerShell, or Azure CLI to increase the instance storage.',
-		details = CONCAT( 'In 2 hours the instance will probably reach ' , CAST(storage_usage_perc AS NUMERIC(4,2)), '% of your storage - increase the instance storage now.')
+		details = CONCAT( 'Storage increased from ' , delta_storage_gb , ' GB to ',
+                             storage_space_used_gb, ' GB in past ', delta_mi, ' min. In may reach ',
+                             storage_space_estimated_gb, ' GB in 2 hours. Increase the instance storage now.')
 from (
 select top 1 storage_usage_perc =
 (storage_space_used_mb +
 ((storage_space_used_mb - lead (storage_space_used_mb, 100) over (order by start_time desc))
 	/
 DATEDIFF(mi, lead (start_time, 100) over (order by start_time desc), start_time))  * 120)
-/ reserved_storage_mb
+/ reserved_storage_mb,
+storage_space_used_gb = CAST(storage_space_used_mb/1000 AS NUMERIC(8,0)),
+storage_space_estimated_gb = CAST((storage_space_used_mb +
+((storage_space_used_mb - lead (storage_space_used_mb, 100) over (order by start_time desc))
+	/
+DATEDIFF(mi, lead (start_time, 100) over (order by start_time desc), start_time))  * 120)/1000 AS NUMERIC(8,0)),
+delta_mi = DATEDIFF(mi, lead (start_time, 1000) over (order by start_time desc), start_time),
+delta_storage_gb =  CAST(lead (storage_space_used_mb, 100) over (order by start_time desc)/1000 AS NUMERIC(8,0))
 from master.sys.server_resource_stats
-where storage_space_used_mb > (.8 * reserved_storage_mb) -- ignore if the current storage is less than 80%
 order by start_time desc
-) a(storage_usage_perc)
+) a(storage_usage_perc, storage_space_used_gb, storage_space_estimated_gb, delta_mi, delta_storage_gb)
 WHERE a.storage_usage_perc > .8
 UNION ALL
 SELECT	name = 'CPU_PRESSURE',
@@ -114,18 +122,18 @@ UNION ALL
 select
         name = wait_type COLLATE Latin1_General_100_CI_AS,
 		reason = CASE wait_type
-                    WHEN 'INSTANCE_LOG_RATE_GOVERNOR' THEN CONCAT('Reaching ',
-                     (SELECT TOP 1 CASE WHEN sku = 'General Purpose' THEN '22'
-                                ELSE '48' END
-                        from master.sys.server_resource_stats
-                        where start_time > DATEADD(minute , -10, GETUTCDATE())), ' MB/s instance log rate limit.' )
+                    WHEN 'INSTANCE_LOG_RATE_GOVERNOR' THEN 'Reaching instance log rate limit.'
                     WHEN 'WRITELOG' THEN 'Potentially reaching the IO limits of log file.'
                     ELSE 'Potentially reaching the IO limit of data file.'
                 END COLLATE Latin1_General_100_CI_AS,
         score = 80.,
 		[state] = 'Investigate' COLLATE Latin1_General_100_CI_AS,
-        script = 'N/A: this is Managed Instance limit' COLLATE Latin1_General_100_CI_AS,
-		details = null
+        script = CASE wait_type
+                    WHEN 'INSTANCE_LOG_RATE_GOVERNOR' THEN 'N/A: This is Managed Instance resource limit.' 
+					WHEN 'WRITELOG' THEN 'Find the log file with IO pressure and increase the size of log file.'
+                    ELSE 'Find the data file with IO pressure and increase the size of data file.'
+                END COLLATE Latin1_General_100_CI_AS,
+		details = null         
  from (select top 10 *
 from sys.dm_os_wait_stats
 order by wait_time_ms desc) as ws

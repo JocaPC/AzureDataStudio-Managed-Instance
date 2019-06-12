@@ -2,8 +2,8 @@
   "name": "managed-instance-dashboard",
   "displayName": "Managed Instance Dashboard",
   "description": "Managed Instance Dashboard",
-  "version": "0.3.0",
-  "publisher": "jocapc",
+  "version": "0.3.1",
+  "publisher": "Microsoft",
   "preview": true,
   "engines": {
     "vscode": "^1.26.0",
@@ -158,7 +158,7 @@
             {
               "name": "Storage usage",
               "gridItemConfig": {
-                "sizex": 1,
+                "sizex": 2,
                 "sizey": 1
               },
               "widget": {
@@ -221,6 +221,6 @@
   "dependencies": {},
   "devDependencies": {
     "vsce": "1.36.2",
-    "vscode": "^1.1.6"
+    "vscode": "^1.1.34"
   }
 }
