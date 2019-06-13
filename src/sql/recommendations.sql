@@ -28,7 +28,7 @@ select	name = 'MEMORY_PRESSURE',
 			END / v.cntr_value )),0)
 		, state = 'Investigate' COLLATE Latin1_General_100_CI_AS
 		, script = 'N/A: Add more memory or find the queries that use most of memory.'
-		, details = 'Check PAGEIOLATCH wait statistics to verify is the problem in memory usage.'
+		, details = 'Check PAGEIOLATCH and RESOURCE_SEMAPHORE wait statistics to verify is the problem in memory usage.'
 from sys.dm_os_performance_counters v
 join sys.dm_os_performance_counters l on v.object_name = l.object_name
 where v.counter_name = 'Page Life Expectancy'
@@ -124,16 +124,28 @@ select
 		reason = CASE wait_type
                     WHEN 'INSTANCE_LOG_RATE_GOVERNOR' THEN 'Reaching instance log rate limit.'
                     WHEN 'WRITELOG' THEN 'Potentially reaching the IO limits of log file.'
-                    ELSE 'Potentially reaching the IO limit of data file.'
+					WHEN 'RESOURCE_SEMAPHORE' THEN 'Possible memory pressure.'
+                    ELSE 'Potentially reaching the IO limit of data file or memory pressure.'
                 END COLLATE Latin1_General_100_CI_AS,
-        score = 80.,
+        score = CASE wait_type
+                    WHEN 'INSTANCE_LOG_RATE_GOVERNOR' THEN 80.
+                    WHEN 'WRITELOG' THEN 60.
+					WHEN 'RESOURCE_SEMAPHORE' THEN 40.
+                    ELSE 50.
+                END,
 		[state] = 'Investigate' COLLATE Latin1_General_100_CI_AS,
         script = CASE wait_type
                     WHEN 'INSTANCE_LOG_RATE_GOVERNOR' THEN 'N/A: This is Managed Instance resource limit.' 
 					WHEN 'WRITELOG' THEN 'Find the log file with IO pressure and increase the size of log file.'
-                    ELSE 'Find the data file with IO pressure and increase the size of data file.'
+                    WHEN 'RESOURCE_SEMAPHORE' THEN 'Optimize top memory consumers or add more cores/memory.'
+					ELSE 'Find the data file with IO pressure and increase the size of data file.'
                 END COLLATE Latin1_General_100_CI_AS,
-		details = null         
+		details = CASE wait_type
+                    WHEN 'INSTANCE_LOG_RATE_GOVERNOR' THEN 'Instance has log rate limit so it can catch-up all changes.'
+                    WHEN 'WRITELOG' THEN 'Queries are waiting log entries to be written.'
+					WHEN 'RESOURCE_SEMAPHORE' THEN 'It is possible that some queries causing memory presure and trying to aquire the page.'
+                    ELSE 'Instance may not succeed to save the memory pages to the data files as they are changed, or has problem fetching the missing pages in memory.'
+                END COLLATE Latin1_General_100_CI_AS       
  from (select top 10 *
 from sys.dm_os_wait_stats
 order by wait_time_ms desc) as ws
