@@ -2,7 +2,7 @@
   "name": "managed-instance-dashboard",
   "displayName": "Managed Instance Dashboard",
   "description": "Managed Instance Dashboard",
-  "version": "0.3.3",
+  "version": "0.3.6",
   "publisher": "Microsoft",
   "preview": true,
   "engines": {
