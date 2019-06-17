@@ -5,30 +5,30 @@ BEGIN;
 
 WITH a as (
 SELECT
-name = 'HIGH_VLF_COUNT',
-reason = CAST(count(*) AS VARCHAR(6)) + ' VLF in "' + name + '" log file',
+name = 'HIGH_VLF_COUNT' COLLATE Latin1_General_100_CI_AS,
+reason = (CAST(count(*) AS VARCHAR(6)) + ' VLF in "' + name + '" log file') COLLATE Latin1_General_100_CI_AS,
 score = CAST(1-EXP(-count(*)/100.) AS NUMERIC(6,2))*100,
 [state] = 'Mitigate' COLLATE Latin1_General_100_CI_AS,
-script = CONCAT("USE [", DB_NAME(mf.database_id),"];DBCC SHRINKFILE (N'",name,"', 1, TRUNCATEONLY);"),
-details = (SELECT [file] = name, db = DB_NAME(mf.database_id), vlf_count = count(*), recommended_script = 'https://github.com/Microsoft/tigertoolbox/tree/master/Fixing-VLFs' FOR JSON PATH, WITHOUT_ARRAY_WRAPPER)
+script = CONCAT("USE [", DB_NAME(mf.database_id),"];DBCC SHRINKFILE (N'",name,"', 1, TRUNCATEONLY);") COLLATE Latin1_General_100_CI_AS,
+details = (SELECT [file] = name, db = DB_NAME(mf.database_id), vlf_count = count(*), recommended_script = 'https://github.com/Microsoft/tigertoolbox/tree/master/Fixing-VLFs' FOR JSON PATH, WITHOUT_ARRAY_WRAPPER) COLLATE Latin1_General_100_CI_AS
 from sys.master_files mf
 cross apply sys.dm_db_log_info(mf.database_id) li
 where li.file_id = mf.file_id
 group by mf.database_id, mf.file_id, name
 having count(*) > 50
 UNION ALL
-select	name = 'MEMORY_PRESSURE',
+select	name = 'MEMORY_PRESSURE' COLLATE Latin1_General_100_CI_AS,
 		reason = CONCAT('Page life expectancy ', v.cntr_value,
 						' lower than ', (((l.cntr_value*8/1024)/1024)/4)*300,
-						' on ', RTRIM(v.object_name))
+						' on ', RTRIM(v.object_name)) COLLATE Latin1_General_100_CI_AS
 		, score = ROUND(100*(1 - EXP (
 			- CASE WHEN l.cntr_value > 0
 				THEN (((l.cntr_value*8./1024)/1024)/4)*300 
 				ELSE 0
 			END / v.cntr_value )),0)
 		, state = 'Investigate' COLLATE Latin1_General_100_CI_AS
-		, script = 'N/A: Add more memory or find the queries that use most of memory.'
-		, details = 'Check PAGEIOLATCH and RESOURCE_SEMAPHORE wait statistics to verify is the problem in memory usage.'
+		, script = 'N/A: Add more memory or find the queries that use most of memory.' COLLATE Latin1_General_100_CI_AS
+		, details = 'Check PAGEIOLATCH and RESOURCE_SEMAPHORE wait statistics to verify is the problem in memory usage.' COLLATE Latin1_General_100_CI_AS
 from sys.dm_os_performance_counters v
 join sys.dm_os_performance_counters l on v.object_name = l.object_name
 where v.counter_name = 'Page Life Expectancy'
@@ -36,19 +36,17 @@ and l.counter_name = 'Database pages'
 and l.object_name like '%Buffer Node%'
 and (CASE WHEN l.cntr_value > 0 THEN (((l.cntr_value*8./1024)/1024)/4)*300 ELSE NULL END) / v.cntr_value > 1
 UNION ALL
-SELECT	name, reason, score,
-		[state] = JSON_VALUE(state, '$.currentValue'),
-        script = JSON_VALUE(details, '$.implementationDetails.script'),
-        details
+SELECT	name COLLATE Latin1_General_100_CI_AS, reason COLLATE Latin1_General_100_CI_AS, score,
+		[state] = JSON_VALUE(state, '$.currentValue') COLLATE Latin1_General_100_CI_AS,
+        script = JSON_VALUE(details, '$.implementationDetails.script') COLLATE Latin1_General_100_CI_AS,
+        details COLLATE Latin1_General_100_CI_AS
 FROM sys.dm_db_tuning_recommendations
-
-
 UNION ALL
-SELECT	name = 'AZURE_STORAGE_35_TB_LIMIT',
-		reason = 'Remaining number of database files is low',
+SELECT	name = 'AZURE_STORAGE_35_TB_LIMIT' COLLATE Latin1_General_100_CI_AS,
+		reason = 'Remaining number of database files is low' COLLATE Latin1_General_100_CI_AS,
 		score = (alloc.size_tb/35.)*100,
 		[state] = 'Warning' COLLATE Latin1_General_100_CI_AS, script = NULL,
-		details = CONCAT( 'You cannot create more than ', (35 - alloc.size_tb) * 8, ' additional database files.')
+		details = CONCAT( 'You cannot create more than ', (35 - alloc.size_tb) * 8, ' additional database files.') COLLATE Latin1_General_100_CI_AS
 FROM
 ( SELECT
 SUM(CASE WHEN  CAST(size * 8. / 1024 / 1024 AS decimal(12,4))  <= 128 THEN 128
@@ -63,15 +61,15 @@ FROM master.sys.master_files
 WHERE physical_name LIKE 'https:%') AS alloc(size_tb)
 WHERE alloc.size_tb > 30
 UNION ALL
-SELECT name = 'STORAGE_LIMIT',
+SELECT name = 'STORAGE_LIMIT' COLLATE Latin1_General_100_CI_AS,
 		reason = CASE CAST(volume_mount_point as CHAR(1))
 		WHEN 'C' THEN 'Reaching TempDB size limit on local storage.'
 		ELSE 'Reaching storage size limit on instance.'
-		END,
+		END COLLATE Latin1_General_100_CI_AS,
 		score = used_gb/total_gb,
 		[state] = 'Mitigate' COLLATE Latin1_General_100_CI_AS,
 		script = 'Use the Azure portal, PowerShell, or Azure CLI to increase the instance storage.' COLLATE Latin1_General_100_CI_AS,
-		details = CONCAT( 'You are using ' , used_gb,'GB out of ', total_gb, 'GB')
+		details = CONCAT( 'You are using ' , used_gb,'GB out of ', total_gb, 'GB') COLLATE Latin1_General_100_CI_AS
 from (SELECT	volume_mount_point,
 		used_gb = CAST(MIN(total_bytes / 1024. / 1024 / 1024) AS NUMERIC(8,1)),
 		available_gb = CAST(MIN(available_bytes / 1024. / 1024 / 1024) AS NUMERIC(8,1)),
@@ -81,14 +79,14 @@ from (SELECT	volume_mount_point,
 	GROUP BY volume_mount_point) volumes(volume_mount_point, used_gb, available_gb, total_gb)
 WHERE used_gb/total_gb > .8
 UNION ALL
-SELECT name = 'STORAGE_LIMIT',
-		reason = 'Reaching storage size limit on instance',
+SELECT name = 'STORAGE_LIMIT' COLLATE Latin1_General_100_CI_AS,
+		reason = 'Reaching storage size limit on instance' COLLATE Latin1_General_100_CI_AS,
 		score = ROUND(100*storage_usage_perc*storage_usage_perc,0),
 		[state] = 'Mitigate' COLLATE Latin1_General_100_CI_AS,
-		script = 'Use the Azure portal, PowerShell, or Azure CLI to increase the instance storage.',
+		script = 'Use the Azure portal, PowerShell, or Azure CLI to increase the instance storage.' COLLATE Latin1_General_100_CI_AS,
 		details = CONCAT( 'Storage increased from ' , delta_storage_gb , ' GB to ',
                              storage_space_used_gb, ' GB in past ', delta_mi, ' min. In may reach ',
-                             storage_space_estimated_gb, ' GB in 2 hours. Increase the instance storage now.')
+                             storage_space_estimated_gb, ' GB in 2 hours. Increase the instance storage now.') COLLATE Latin1_General_100_CI_AS
 from (
 select top 1 storage_usage_perc =
 (storage_space_used_mb +
@@ -108,16 +106,31 @@ order by start_time desc
 ) a(storage_usage_perc, storage_space_used_gb, storage_space_estimated_gb, delta_mi, delta_storage_gb)
 WHERE a.storage_usage_perc > .8
 UNION ALL
-SELECT	name = 'CPU_PRESSURE',
-		reason = CONCAT('High CPU usage ', cpu ,'% on the instance in past hour.'),
+SELECT	name = 'CPU_PRESSURE' COLLATE Latin1_General_100_CI_AS,
+		reason = CONCAT('High CPU usage ', cpu ,'% on the instance in past hour.') COLLATE Latin1_General_100_CI_AS,
 		score = cpu,
 		[state] = 'Investigate' COLLATE Latin1_General_100_CI_AS,
-		script = 'N/A: Find top queries that are using a lot of CPU and optimize them or add more cores by upgrading the instance.',
-		details = CONCAT( 'Instance is using ', cpu, '% of CPU.')
+		script = 'N/A: Find top queries that are using a lot of CPU and optimize them or add more cores by upgrading the instance.' COLLATE Latin1_General_100_CI_AS,
+		details = CONCAT( 'Instance is using ', cpu, '% of CPU.') COLLATE Latin1_General_100_CI_AS
 FROM (select cpu = AVG(avg_cpu_percent)
 	from master.sys.server_resource_stats
 	where start_time > DATEADD(hour , -1, GETUTCDATE())) as usage(cpu)
 where cpu > 90
+UNION ALL
+SELECT	name = command COLLATE Latin1_General_100_CI_AS,
+		reason = command COLLATE Latin1_General_100_CI_AS,
+		score = CASE command
+                    WHEN 'RESTORE DATABASE' THEN 40.
+                    WHEN 'BACKUP DATABASE' THEN 60.
+					WHEN 'BACKUP LOG' THEN 30.
+					ELSE 60.
+                END,
+		[state] = 'Info' COLLATE Latin1_General_100_CI_AS,
+		script = NULL,
+		details = CONCAT(cnt, command, ' requests are currently in progress') COLLATE Latin1_General_100_CI_AS  
+FROM (SELECT r.command, cnt = count(*)
+FROM sys.dm_exec_requests r WHERE command IN ('RESTORE DATABASE','BACKUP DATABASE','BACKUP LOG','RESTORE LOG')
+GROUP BY command) bre (command, cnt)
 UNION ALL
 select
         name = wait_type COLLATE Latin1_General_100_CI_AS,
