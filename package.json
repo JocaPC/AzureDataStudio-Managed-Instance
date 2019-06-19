@@ -7,8 +7,7 @@
   "preview": true,
   "engines": {
     "vscode": "^1.26.0",
-    "azdata": "*",
-    "sqlops": "*"
+    "azdata": "*"
   },
   "icon": "images/ManagedInstanceLogo.png",
   "license": "SEE LICENSE IN LICENSE.txt",
