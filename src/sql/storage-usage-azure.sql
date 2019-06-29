@@ -33,7 +33,7 @@ SELECT	Storage = CASE WHEN volume_mount_point = 'http://' THEN 'Remote storage'
 FROM sys.master_files AS f
 CROSS APPLY sys.dm_os_volume_stats(f.database_id, f.file_id)
 GROUP BY volume_mount_point)
-SELECT  [(on Azure Premium disks):] = 'User and system databases',
+SELECT  [(on Azure Premium disks):] = 'User/system databases',
         [GB Used], [GB Available], [GB Total], 
         [Remaining files (data and log)] = [Remaining files],
         [*Backups are not included in this report] = ''

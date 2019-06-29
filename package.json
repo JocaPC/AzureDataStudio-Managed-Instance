@@ -2,7 +2,7 @@
   "name": "managed-instance-dashboard",
   "displayName": "Managed Instance Dashboard",
   "description": "Managed Instance Dashboard",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "publisher": "Microsoft",
   "preview": true,
   "engines": {
@@ -58,6 +58,17 @@
               },
               "container": {
                 "managed-instance-health-container": {}
+              }
+            },
+            {
+              "id": "managed-instance-logs",
+              "title": "Logs",
+              "icon": {
+                "light": "./src/media/support.svg",
+                "dark": "./src/media/support_inverse.svg"
+              },
+              "container": {
+                "managed-instance-error-log-container": {}
               }
             }
           ]
@@ -151,6 +162,20 @@
           },
           "queryFile": "./src/sql/recommendations.sql"
         }
+      },
+      {
+        "id": "mi-error-logs",
+        "contrib": {
+          "type": {
+            "table": {
+              "dataDirection": "horizontal",
+              "columnsAsLabels": false,
+              "labelFirstColumn": false,
+              "legendPosition": "top"
+            }
+          },
+          "queryFile": "./src/sql/logs.sql"
+        }
       }
     ],
     "dashboard.containers": [
@@ -223,13 +248,30 @@
         "container": {
           "widgets-container": [
             {
-              "name": "Recommendations",
+              "name": "Recommendations and warnings",
               "gridItemConfig": {
                 "sizex": 4,
                 "sizey": 3
               },
               "widget": {
                 "mi-recommendations": {}
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "managed-instance-error-log-container",
+        "container": {
+          "widgets-container": [
+            {
+              "name": "Latest error log entries",
+              "gridItemConfig": {
+                "sizex": 4,
+                "sizey": 3
+              },
+              "widget": {
+                "mi-error-logs": {}
               }
             }
           ]
