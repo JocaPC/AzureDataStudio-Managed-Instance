@@ -15,7 +15,7 @@ SELECT	Storage = CASE WHEN volume_mount_point = 'http://' THEN 'Remote storage'
 FROM sys.master_files AS f
 CROSS APPLY sys.dm_os_volume_stats(f.database_id, f.file_id)
 GROUP BY volume_mount_point)
-SELECT [(on local SSD):] = case 
+SELECT [ ] = case 
                 when sku.service_tier = 'GeneralPurpose' then 'TempDB'
                 else 'TempDB, user and system databases'
             end,
