@@ -53,8 +53,8 @@
               "id": "managed-instance-health",
               "title": "Health",
               "icon": {
-                "light": "./src/media/health.svg",
-                "dark": "./src/media/health_inverse.svg"
+                "light": "./src/media/sync.svg",
+                "dark": "./src/media/sync_inverse.svg"
               },
               "container": {
                 "managed-instance-health-container": {}
@@ -64,8 +64,8 @@
               "id": "managed-instance-logs",
               "title": "Logs",
               "icon": {
-                "light": "./src/media/support.svg",
-                "dark": "./src/media/support_inverse.svg"
+                "light": "./src/media/health.svg",
+                "dark": "./src/media/health_inverse.svg"
               },
               "container": {
                 "managed-instance-error-log-container": {}

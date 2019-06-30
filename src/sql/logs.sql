@@ -1,5 +1,8 @@
+IF( SERVERPROPERTY('EngineEdition') = 8 )
+BEGIN
 /*
 Description:
+Script based on Dimitri Furman's  dbo.sp_readmierrorlog procedure.
 dbo.sp_readmierrorlog is a stored procedure that returns the contents of SQL Server and SQL Agent error logs on an MI instance.
 The procedure filters out debug-level messages logged for service operation and troubleshooting purposes,
 in order to make the error log more readable and actionable for MI users.
@@ -9,23 +12,21 @@ Unfiltered error log remains available using the sys.sp_readerrorlog stored proc
 
 Usage examples:
 
--- Current filtered MI error log
+-- Current filtered MI error log (default)
 DECLARE
-    @p1 int = 0, -- 1 before as rollower
-    @p2 int = NULL, -- 2 SQL Agent Jobs 
-    @p3 nvarchar(4000) = NULL,
-    @p4 nvarchar(4000) = NULL
-
-
--- Filtered MI error log before last rollover
-DECLARE
-    @p1 int = 1, --> 1 Before last rollower
+    @p1 int = 0,
     @p2 int = NULL, 
     @p3 nvarchar(4000) = NULL,
     @p4 nvarchar(4000) = NULL
 
+-- Current filtered MI SQL Agent log
+DECLARE
+    @p1 int = 0, 
+    @p2 int = 2, -- 2 SQL Agent Jobs 
+    @p3 nvarchar(4000) = NULL,
+    @p4 nvarchar(4000) = NULL
+
 -- Current filtered MI error log with messages containing string "Error: 18056"
-EXEC dbo.sp_readmierrorlog 0, 1, 'Error: 18056';
 DECLARE
     @p1 int = 0, 
     @p2 int = NULL,
@@ -39,10 +40,10 @@ DECLARE
     @p3 nvarchar(4000) = 'Error: 18056',
     @p4 nvarchar(4000) = 'state: 1'
 
--- Current filtered MI SQL Agent log
+-- Filtered MI error log before last rollover
 DECLARE
-    @p1 int = 0, 
-    @p2 int = 2, -- 2 SQL Agent Jobs 
+    @p1 int = 1, --> 1 Before last rollower
+    @p2 int = NULL, 
     @p3 nvarchar(4000) = NULL,
     @p4 nvarchar(4000) = NULL
 
@@ -245,6 +246,8 @@ WHERE NOT EXISTS (
                        )
                  )
 ORDER BY el.LogDate DESC,
-         el.LogID;
+         el.LogID
+OPTION (RECOMPILE, MAXDOP 1);
 
 DROP TABLE IF EXISTS #ErrorLog;
+END
