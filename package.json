@@ -29,7 +29,7 @@
           "nav-section": [
             {
               "id": "managed-instance-monitoring",
-              "title": "Monitor",
+              "title": "Properties",
               "icon": {
                 "light": "./src/media/monitor.svg",
                 "dark": "./src/media/monitor_inverse.svg"
@@ -51,7 +51,7 @@
             },
             {
               "id": "managed-instance-health",
-              "title": "Health",
+              "title": "Replicas",
               "icon": {
                 "light": "./src/media/sync.svg",
                 "dark": "./src/media/sync_inverse.svg"
