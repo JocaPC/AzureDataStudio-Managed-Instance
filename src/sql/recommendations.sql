@@ -6,7 +6,7 @@ BEGIN;
 WITH a as (
 SELECT
 name = 'HIGH_VLF_COUNT' COLLATE Latin1_General_100_CI_AS,
-reason = (CAST(count(*) AS VARCHAR(6)) + ' VLF in "' + name + '" log file') COLLATE Latin1_General_100_CI_AS,
+reason = (CAST(count(*) AS VARCHAR(6)) + ' VLF in "' + name + '" log file in database ' + DB_NAME(mf.database_id)) COLLATE Latin1_General_100_CI_AS,
 score = CAST(1-EXP(-count(*)/100.) AS NUMERIC(6,2))*100,
 [state] = 'Mitigate' COLLATE Latin1_General_100_CI_AS,
 script = CONCAT("USE [", DB_NAME(mf.database_id),"];DBCC SHRINKFILE (N'",name,"', 1, TRUNCATEONLY);") COLLATE Latin1_General_100_CI_AS,
@@ -110,7 +110,7 @@ SELECT	name = 'CPU_PRESSURE' COLLATE Latin1_General_100_CI_AS,
 		reason = CONCAT('High CPU usage ', cpu ,'% on the instance in past hour.') COLLATE Latin1_General_100_CI_AS,
 		score = cpu,
 		[state] = 'Investigate' COLLATE Latin1_General_100_CI_AS,
-		script = 'N/A: Find top queries that are using a lot of CPU and optimize them or add more cores by upgrading the instance.' COLLATE Latin1_General_100_CI_AS,
+		script = 'N/A: Find the top queries that are using a lot of CPU and optimize them or add more cores by upgrading the instance.' COLLATE Latin1_General_100_CI_AS,
 		details = CONCAT( 'Instance is using ', cpu, '% of CPU.') COLLATE Latin1_General_100_CI_AS
 FROM (select cpu = AVG(avg_cpu_percent)
 	from master.sys.server_resource_stats
@@ -127,7 +127,7 @@ SELECT	name = command COLLATE Latin1_General_100_CI_AS,
                 END,
 		[state] = 'Info' COLLATE Latin1_General_100_CI_AS,
 		script = NULL,
-		details = CONCAT(cnt, command, ' requests are currently in progress') COLLATE Latin1_General_100_CI_AS  
+		details = CONCAT(cnt, ' ', command, ' requests are currently in progress') COLLATE Latin1_General_100_CI_AS  
 FROM (SELECT r.command, cnt = count(*)
 FROM sys.dm_exec_requests r WHERE command IN ('RESTORE DATABASE','BACKUP DATABASE','BACKUP LOG','RESTORE LOG')
 GROUP BY command) bre (command, cnt)

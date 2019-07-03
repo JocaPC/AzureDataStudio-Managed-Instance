@@ -53,8 +53,8 @@
               "id": "managed-instance-health",
               "title": "Replicas",
               "icon": {
-                "light": "./src/media/sync.svg",
-                "dark": "./src/media/sync_inverse.svg"
+                "light": "./src/media/replicas.svg",
+                "dark": "./src/media/replicas_inverse.svg"
               },
               "container": {
                 "managed-instance-health-container": {}
