@@ -19,7 +19,7 @@ having count(*) > 50
 UNION ALL
 select	name = 'MEMORY_PRESSURE' COLLATE Latin1_General_100_CI_AS,
 		reason = CONCAT('Page life expectancy ', v.cntr_value,
-						' lower than ', (((l.cntr_value*8/1024)/1024)/4)*300,
+						' less than ', (((300*l.cntr_value*8/1024)/1024)/4),
 						' on ', RTRIM(v.object_name)) COLLATE Latin1_General_100_CI_AS
 		, score = ROUND(100*(1 - EXP (
 			- CASE WHEN l.cntr_value > 0
