@@ -105,6 +105,7 @@ from master.sys.server_resource_stats
 order by start_time desc
 ) a(storage_usage_perc, storage_space_used_gb, storage_space_estimated_gb, delta_mi, delta_storage_gb)
 WHERE a.storage_usage_perc > .8
+AND 1.1 * storage_space_used_gb < storage_space_estimated_gb
 UNION ALL
 SELECT	name = 'CPU_PRESSURE' COLLATE Latin1_General_100_CI_AS,
 		reason = CONCAT('High CPU usage ', cpu ,'% on the instance in past hour.') COLLATE Latin1_General_100_CI_AS,
