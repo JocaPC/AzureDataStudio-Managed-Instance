@@ -66,7 +66,7 @@ SELECT name = 'STORAGE_LIMIT' COLLATE Latin1_General_100_CI_AS,
 		WHEN 'C' THEN 'Reaching TempDB size limit on local storage.'
 		ELSE 'Reaching storage size limit on instance.'
 		END COLLATE Latin1_General_100_CI_AS,
-		score = used_gb/total_gb,
+		score = CAST(100*used_gb/total_gb as INT),
 		[state] = 'Mitigate' COLLATE Latin1_General_100_CI_AS,
 		script = 'Use the Azure portal, PowerShell, or Azure CLI to increase the instance storage.' COLLATE Latin1_General_100_CI_AS,
 		details = CONCAT( 'You are using ' , used_gb,'GB out of ', total_gb, 'GB') COLLATE Latin1_General_100_CI_AS
@@ -127,7 +127,11 @@ SELECT	name = command COLLATE Latin1_General_100_CI_AS,
                 END,
 		[state] = 'Info' COLLATE Latin1_General_100_CI_AS,
 		script = NULL,
-		details = CONCAT(cnt, ' ', command, ' requests are currently in progress') COLLATE Latin1_General_100_CI_AS  
+		details = CONCAT(cnt, ' ', command, 
+        CASE
+			WHEN cnt = 1 THEN ' request is currently in progress'
+        	ELSE ' requests are currently in progress'
+        END) COLLATE Latin1_General_100_CI_AS    
 FROM (SELECT r.command, cnt = count(*)
 FROM sys.dm_exec_requests r WHERE command IN ('RESTORE DATABASE','BACKUP DATABASE','BACKUP LOG','RESTORE LOG')
 GROUP BY command) bre (command, cnt)
