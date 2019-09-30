@@ -56,24 +56,26 @@ DECLARE
 
 DROP TABLE IF EXISTS #ErrorLog;
 
-CREATE TABLE #ErrorLog (
+
+SET NOCOUNT ON;
+
+DECLARE @ErrorLog TABLE (
                         LogID int NOT NULL IDENTITY(1,1),
                         LogDate datetime NOT NULL,
                         ProcessInfo nvarchar(50) NOT NULL,
                         LogText nvarchar(4000) NOT NULL,
-                        --PRIMARY KEY (LogDate, LogID)
-						INDEX cci CLUSTERED COLUMNSTORE
+                        PRIMARY KEY (LogDate, LogID)
                         );
 DECLARE @LogFilter TABLE (
                          FilterText nvarchar(100) NOT NULL PRIMARY KEY,
                          FilterType tinyint NOT NULL -- 1 - starts with; 2 - contains; 3 - starts with "Backup(<user db guid>"
                          );
 
---IF (NOT IS_SRVROLEMEMBER(N'securityadmin') = 1) AND (NOT HAS_PERMS_BY_NAME(NULL, NULL, 'VIEW SERVER STATE') = 1)
---BEGIN
-  --  RAISERROR(27219,-1,-1);
-    
---END;
+IF (NOT IS_SRVROLEMEMBER(N'securityadmin') = 1) AND (NOT HAS_PERMS_BY_NAME(NULL, NULL, 'VIEW SERVER STATE') = 1)
+BEGIN
+    RAISERROR(27219,-1,-1);
+    RETURN (1);
+END;
 
 -- Populate filter table
 INSERT INTO @LogFilter
@@ -82,6 +84,7 @@ FilterText,
 FilterType
 )
 VALUES
+('`[AzureKeyVaultClientHelper::CheckDbAkvWrapUnwrap`]: Skipped',1),
 (' `[RotateDatabaseKeys`]',1),
 (' PVS',2),
 ('`[ERROR`] Log file %.xel cannot be deleted. Last error code from CreateFile is 32',2),
@@ -93,31 +96,18 @@ VALUES
 ('`[CheckDbAkvAccess`]',1),
 ('`[CurrentSecretName`]',1),
 ('`[DbrSubscriber`]',1),
+('`[DISK_SPACE_TO_RESERVE_PROPERTY`]:',1),
 ('`[EnableBPEOnAzure`]',1),
 ('`[FabricDbrSubscriber::',1),
 ('`[GenericSubscriber`]',1),
 ('`[GetEncryptionProtectorTypeInternal`]',1),
 ('`[GetInstanceSloGuid`]',1),
+('`[GetInterfaceEndpointsConfigurationInternal`]',1),
 ('`[GetTdeAkvUrisInternal`]',1),
 ('`[HADR Fabric`]',1),
 ('`[HADR TRANSPORT`]',1),
 ('`[INFO`] `[CKPT`] ',1),
 ('`[INFO`] ckptCloseThreadFn():',1),
--- START NEW
-('`[SloManager::AdjustCpuSettingForResourceGroup`] :',1),
-('`[SloManager::AdjustCpuSettingForResourcePool`] :',1),
-('`[GetInstanceRgSize`]',1),
-('`[GetFabricPropertyAADTenantId`]',1),
-('`[SloManager::GetFabricPropertyAADServerAdminSid`]',1),
-('`[SloParams::ParseSloParams`] :',1),
-('`[DISK_SPACE_TO_RESERVE_PROPERTY`]',1),
-('`[GetInterfaceEndpointsConfigurationInternal`]',1),
-('`[SetupInterfaceEndpointsConfiguration`]',1),
-('`[VersionCleaner`]',1),
-('ConfigureRgInstance - RgInstanceSetting',1),
-('** FabricStatefulServiceFactory::Startup **',1),
-('Started XE session',1),
--- END NEW
 ('`[INFO`] createBackupContextV2()',1),
 ('`[INFO`] Created Extended Events session',1),
 ('`[INFO`] Database ID:',1),
@@ -131,12 +121,16 @@ VALUES
 ('`[LogPool::',1),
 ('`[ReplicaController',1),
 ('`[SetupAkvPrincipalCert`]',1),
+('`[SetupInterfaceEndpointsConfiguration`]',1),
 ('`[SetupTdeAkvUri`]',1),
 ('`[SetupSslServerCertificate`]',1),
 ('`[SetupTenantCertificates`]',1),
+('`[SloManager::AdjustCpuSettingForResource',1),
+('`[SloParams::ParseSloParams`]',1),
 ('`[SQLInstancePartner`]',1),
 ('`[TransportSubscriber`]',1),
 ('`[XDB_DATABASE_SETTINGS_PROPERTY',1),
+('`[VersionCleaner`]`[DbId:',1),
 ('`[WARNING`] === At least % extensions for file {',2),
 ('`] local replica received build replica response from `[',2),
 ('`] log capture becomes idle',2),
@@ -148,7 +142,7 @@ VALUES
 ('Backup(managed_model):',1),
 ('Backup(msdb):',1),
 ('Backup(replicatedmaster):',1),
-('Cannot open database ''model_msdb'' version 888. Upgrade the database to the latest version.',1),
+('Cannot open database ''model_msdb'' version',1),
 ('CFabricReplicaController',2),
 ('CHadrSession',1),
 ('Cleaning up conversations for `[',1),
@@ -165,6 +159,7 @@ VALUES
 ('Error: 946, Severity: 14, State: 1.',1),
 ('FabricDBTableInfo',1),
 ('Failed to retrieve Property',1),
+('Filemark on device',1),
 ('FixupLogTail(progress) zeroing',1),
 ('Force log send mode',1),
 ('FSTR: File \\',1),
@@ -201,6 +196,7 @@ VALUES
 ('State information for database ''',1),
 ('The recovery LSN (',1),
 ('UpdateHadronTruncationLsn(',1),
+('Warning: The join order has been enforced because a local join hint is used.',1),
 ('XactRM::PrepareLocalXact',2),
 ('Zeroing ',1)
 ;
@@ -208,20 +204,20 @@ VALUES
 -- Get unfiltered log
 IF @p2 IS NULL
 BEGIN
-    INSERT INTO #ErrorLog (LogDate, ProcessInfo, LogText)
+    INSERT INTO @ErrorLog (LogDate, ProcessInfo, LogText)
     EXEC sys.xp_readerrorlog @p1;
 END
 ELSE
 BEGIN
-    INSERT INTO #ErrorLog (LogDate, ProcessInfo, LogText)
+    INSERT INTO @ErrorLog (LogDate, ProcessInfo, LogText)
     EXEC sys.xp_readerrorlog @p1,@p2,@p3,@p4;
 END;
 
 -- Return filtered log
-SELECT TOP 100 el.LogDate,
+SELECT el.LogDate,
        el.ProcessInfo,
        el.LogText
-FROM #ErrorLog AS el
+FROM @ErrorLog AS el
 WHERE NOT EXISTS (
                  SELECT 1
                  FROM @LogFilter AS lf
@@ -242,10 +238,10 @@ WHERE NOT EXISTS (
                        AND
                        el.LogText LIKE lf.FilterText + N'%'
                        AND
-                       TRY_CONVERT(uniqueidentifier,SUBSTRING(el.LogText, 8, 36)) IS NOT NULL
+                       TRY_CONVERT(uniqueidentifier, SUBSTRING(el.LogText, 8, 36)) IS NOT NULL
                        )
                  )
-ORDER BY el.LogDate DESC,
+ORDER BY el.LogDate,
          el.LogID
 OPTION (RECOMPILE, MAXDOP 1);
 
