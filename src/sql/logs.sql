@@ -54,7 +54,6 @@ DECLARE
     @p3 nvarchar(4000) = NULL,
     @p4 nvarchar(4000) = NULL
 
-DROP TABLE IF EXISTS #ErrorLog;
 
 
 SET NOCOUNT ON;
@@ -74,7 +73,6 @@ DECLARE @LogFilter TABLE (
 IF (NOT IS_SRVROLEMEMBER(N'securityadmin') = 1) AND (NOT HAS_PERMS_BY_NAME(NULL, NULL, 'VIEW SERVER STATE') = 1)
 BEGIN
     RAISERROR(27219,-1,-1);
-    RETURN (1);
 END;
 
 -- Populate filter table
@@ -214,36 +212,127 @@ BEGIN
 END;
 
 -- Return filtered log
-SELECT el.LogDate,
+SELECT TOP 100 el.LogDate,
        el.ProcessInfo,
        el.LogText
 FROM @ErrorLog AS el
-WHERE NOT EXISTS (
-                 SELECT 1
-                 FROM @LogFilter AS lf
-                 WHERE (
-                       lf.FilterType = 1
-                       AND
-                       el.LogText LIKE lf.FilterText + N'%' ESCAPE '`'
-                       )
-                       OR
-                       (
-                       lf.FilterType = 2
-                       AND
-                       el.LogText LIKE N'%' + lf.FilterText + N'%' ESCAPE '`'
-                       )
-                       OR
-                       (
-                       lf.FilterType = 3
-                       AND
-                       el.LogText LIKE lf.FilterText + N'%'
-                       AND
-                       TRY_CONVERT(uniqueidentifier, SUBSTRING(el.LogText, 8, 36)) IS NOT NULL
-                       )
-                 )
-ORDER BY el.LogDate,
+WHERE SUBSTRING(el.LogText, 1, 7) <> N'Backup('
+AND SUBSTRING(el.LogText, 1, 21) <> N' [RotateDatabaseKeys]'
+AND SUBSTRING(el.LogText, 1, 58) <> N'[AzureKeyVaultClientHelper::CheckDbAkvWrapUnwrap]: Skipped'
+AND SUBSTRING(el.LogText, 1, 21) <> N'[CFabricCommonUtils::'
+AND SUBSTRING(el.LogText, 1, 24) <> N'[CFabricReplicaManager::'
+AND SUBSTRING(el.LogText, 1, 26) <> N'[CFabricReplicaPublisher::'
+AND SUBSTRING(el.LogText, 1, 25) <> N'[CFabricReplicatorProxy::'
+AND SUBSTRING(el.LogText, 1, 18) <> N'[CheckDbAkvAccess]'
+AND SUBSTRING(el.LogText, 1, 19) <> N'[CurrentSecretName]'
+AND SUBSTRING(el.LogText, 1, 15) <> N'[DbrSubscriber]'
+AND SUBSTRING(el.LogText, 1, 33) <> N'[DISK_SPACE_TO_RESERVE_PROPERTY]:'
+AND SUBSTRING(el.LogText, 1, 18) <> N'[EnableBPEOnAzure]'
+AND SUBSTRING(el.LogText, 1, 22) <> N'[FabricDbrSubscriber::'
+AND SUBSTRING(el.LogText, 1, 19) <> N'[GenericSubscriber]'
+AND SUBSTRING(el.LogText, 1, 36) <> N'[GetEncryptionProtectorTypeInternal]'
+AND SUBSTRING(el.LogText, 1, 20) <> N'[GetInstanceSloGuid]'
+AND SUBSTRING(el.LogText, 1, 44) <> N'[GetInterfaceEndpointsConfigurationInternal]'
+AND SUBSTRING(el.LogText, 1, 23) <> N'[GetTdeAkvUrisInternal]'
+AND SUBSTRING(el.LogText, 1, 13) <> N'[HADR Fabric]'
+AND SUBSTRING(el.LogText, 1, 16) <> N'[HADR TRANSPORT]'
+AND SUBSTRING(el.LogText, 1, 13) <> N'[INFO] [CKPT] '
+AND SUBSTRING(el.LogText, 1, 27) <> N'[INFO] ckptCloseThreadFn():'
+AND SUBSTRING(el.LogText, 1, 30) <> N'[INFO] createBackupContextV2()'
+AND SUBSTRING(el.LogText, 1, 38) <> N'[INFO] Created Extended Events session'
+AND SUBSTRING(el.LogText, 1, 19) <> N'[INFO] Database ID:'
+AND SUBSTRING(el.LogText, 1, 41) <> N'[INFO] getMaxUnrecoverableCheckpointId():'
+AND SUBSTRING(el.LogText, 1, 9) <> N'[INFO] Hk'
+AND SUBSTRING(el.LogText, 1, 24) <> N'[INFO] HostCommonStorage'
+AND SUBSTRING(el.LogText, 1, 40) <> N'[INFO] ProcessElementsInBackupContext().'
+AND SUBSTRING(el.LogText, 1, 29) <> N'[INFO] RootFileDeserialize():'
+AND SUBSTRING(el.LogText, 1, 31) <> N'[INFO] trimSystemTablesByLsn():'
+AND SUBSTRING(el.LogText, 1, 15) <> N'[LAGController]'
+AND SUBSTRING(el.LogText, 1, 10) <> N'[LogPool::'
+AND SUBSTRING(el.LogText, 1, 18) <> N'[ReplicaController'
+AND SUBSTRING(el.LogText, 1, 23) <> N'[SetupAkvPrincipalCert]'
+AND SUBSTRING(el.LogText, 1, 38) <> N'[SetupInterfaceEndpointsConfiguration]'
+AND SUBSTRING(el.LogText, 1, 27) <> N'[SetupSslServerCertificate]'
+AND SUBSTRING(el.LogText, 1, 16) <> N'[SetupTdeAkvUri]'
+AND SUBSTRING(el.LogText, 1, 25) <> N'[SetupTenantCertificates]'
+AND SUBSTRING(el.LogText, 1, 40) <> N'[SloManager::AdjustCpuSettingForResource'
+AND SUBSTRING(el.LogText, 1, 27) <> N'[SloParams::ParseSloParams]'
+AND SUBSTRING(el.LogText, 1, 20) <> N'[SQLInstancePartner]'
+AND SUBSTRING(el.LogText, 1, 21) <> N'[TransportSubscriber]'
+AND SUBSTRING(el.LogText, 1, 22) <> N'[VersionCleaner][DbId:'
+AND SUBSTRING(el.LogText, 1, 31) <> N'[XDB_DATABASE_SETTINGS_PROPERTY'
+AND SUBSTRING(el.LogText, 1, 35) <> N'A connection for availability group'
+AND SUBSTRING(el.LogText, 1, 20) <> N'accepting vlf header'
+AND SUBSTRING(el.LogText, 1, 56) <> N'BACKUP DATABASE WITH DIFFERENTIAL successfully processed'
+AND SUBSTRING(el.LogText, 1, 22) <> N'Backup(managed_model):'
+AND SUBSTRING(el.LogText, 1, 13) <> N'Backup(msdb):'
+AND SUBSTRING(el.LogText, 1, 25) <> N'Backup(replicatedmaster):'
+AND SUBSTRING(el.LogText, 1, 43) <> N'Cannot open database ''model_msdb'' version'
+AND SUBSTRING(el.LogText, 1, 12) <> N'CHadrSession'
+AND SUBSTRING(el.LogText, 1, 31) <> N'Cleaning up conversations for ['
+AND SUBSTRING(el.LogText, 1, 15) <> N'cloud Partition'
+AND SUBSTRING(el.LogText, 1, 18) <> N'CloudTelemetryBase'
+AND SUBSTRING(el.LogText, 1, 31) <> N'Copying dbt_inactiveDurationMin'
+AND SUBSTRING(el.LogText, 1, 45) <> N'Database differential changes were backed up.'
+AND SUBSTRING(el.LogText, 1, 24) <> N'DbMgrPartnerCommitPolicy'
+AND SUBSTRING(el.LogText, 1, 14) <> N'DBR Subscriber'
+AND SUBSTRING(el.LogText, 1, 12) <> N'DWLSSettings'
+AND SUBSTRING(el.LogText, 1, 22) <> N'Dynamic Configuration:'
+AND SUBSTRING(el.LogText, 1, 35) <> N'Error: 946, Severity: 14, State: 1.'
+AND SUBSTRING(el.LogText, 1, 17) <> N'FabricDBTableInfo'
+AND SUBSTRING(el.LogText, 1, 27) <> N'Failed to retrieve Property'
+AND SUBSTRING(el.LogText, 1, 18) <> N'Filemark on device'
+AND SUBSTRING(el.LogText, 1, 30) <> N'FixupLogTail(progress) zeroing'
+AND SUBSTRING(el.LogText, 1, 19) <> N'Force log send mode'
+AND SUBSTRING(el.LogText, 1, 13) <> N'FSTR: File \\'
+AND SUBSTRING(el.LogText, 1, 14) <> N'HADR_FQDR_XRF:'
+AND SUBSTRING(el.LogText, 1, 51) <> N'Http code after sending the notification for action'
+AND SUBSTRING(el.LogText, 1, 10) <> N'IsInCreate'
+AND SUBSTRING(el.LogText, 1, 15) <> N'Layered AG Role'
+AND SUBSTRING(el.LogText, 1, 28) <> N'Log was backed up. Database:'
+AND SUBSTRING(el.LogText, 1, 34) <> N'Log writer started sending: DbId ['
+AND SUBSTRING(el.LogText, 1, 25) <> N'LOG_SEND_TRANSITION: DbId'
+AND SUBSTRING(el.LogText, 1, 9) <> N'LogPool::'
+AND SUBSTRING(el.LogText, 1, 32) <> N'PerformConfigureDatabaseInternal'
+AND SUBSTRING(el.LogText, 1, 21) <> N'PrimaryReplicaInfoMsg'
+AND SUBSTRING(el.LogText, 1, 60) <> N'Processing BuildReplicaCatchup source operation on replica ['
+AND SUBSTRING(el.LogText, 1, 23) <> N'Processing pending list'
+AND SUBSTRING(el.LogText, 1, 37) <> N'Processing PrimaryConfigUpdated Event'
+AND SUBSTRING(el.LogText, 1, 28) <> N'ProcessPrimaryReplicaInfoMsg'
+AND SUBSTRING(el.LogText, 1, 38) <> N'Querying Property Manager for Property'
+AND SUBSTRING(el.LogText, 1, 37) <> N'RefreshFabricPropertyServiceObjective'
+AND SUBSTRING(el.LogText, 1, 17) <> N'ResyncWithPrimary'
+AND SUBSTRING(el.LogText, 1, 18) <> N'Retrieved Property'
+AND SUBSTRING(el.LogText, 1, 31) <> N'Sending the notification action'
+AND SUBSTRING(el.LogText, 1, 11) <> N'SetDbFields'
+AND SUBSTRING(el.LogText, 1, 34) <> N'Skip Initialization for XE session'
+AND SUBSTRING(el.LogText, 1, 32) <> N'Skipped running db sample script'
+AND SUBSTRING(el.LogText, 1, 7) <> N'SloInfo'
+AND SUBSTRING(el.LogText, 1, 12) <> N'SloManager::'
+AND SUBSTRING(el.LogText, 1, 16) <> N'SloRgPropertyBag'
+AND SUBSTRING(el.LogText, 1, 33) <> N'State information for database '''
+AND SUBSTRING(el.LogText, 1, 18) <> N'The recovery LSN ('
+AND SUBSTRING(el.LogText, 1, 26) <> N'UpdateHadronTruncationLsn('
+AND SUBSTRING(el.LogText, 1, 76) <> N'Warning: The join order has been enforced because a local join hint is used.'
+AND SUBSTRING(el.LogText, 1, 7) <> N'Zeroing '
+AND el.LogText NOT LIKE N'% PVS%' ESCAPE '`'
+AND el.LogText NOT LIKE N'%) log capture is rescheduled%' ESCAPE '`'
+AND el.LogText NOT LIKE N'%`[ERROR`] Log file %.xel cannot be deleted. Last error code from CreateFile is 32%' ESCAPE '`'
+AND el.LogText NOT LIKE N'%`[WARNING`] === At least % extensions for file {%' ESCAPE '`'
+AND el.LogText NOT LIKE N'%`] local replica received build replica response from `[%' ESCAPE '`'
+AND el.LogText NOT LIKE N'%`] log capture becomes idle%' ESCAPE '`'
+AND el.LogText NOT LIKE N'%AppInstanceId `[%`]. LeaseOrderId%' ESCAPE '`'
+AND el.LogText NOT LIKE N'%CFabricReplicaController%' ESCAPE '`'
+AND el.LogText NOT LIKE N'%Deflation Settings%' ESCAPE '`'
+AND el.LogText NOT LIKE N'%DeflationSettings%' ESCAPE '`'
+AND el.LogText NOT LIKE N'%HaDrDbMgr%' ESCAPE '`'
+AND el.LogText NOT LIKE N'%HadrLogCapture::CaptureLogBlock%' ESCAPE '`'
+AND el.LogText NOT LIKE N'%is upgrading script ''Sql.UserDb.Sql''%' ESCAPE '`'
+AND el.LogText NOT LIKE N'%Persistent store table%' ESCAPE '`'
+AND el.LogText NOT LIKE N'%snapshot isolation setting ON for logical master.%' ESCAPE '`'
+AND el.LogText NOT LIKE N'%XactRM::PrepareLocalXact%' ESCAPE '`'
+ORDER BY el.LogDate DESC,
          el.LogID
 OPTION (RECOMPILE, MAXDOP 1);
 
-DROP TABLE IF EXISTS #ErrorLog;
 END

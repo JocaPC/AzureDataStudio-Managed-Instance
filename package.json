@@ -2,7 +2,7 @@
   "name": "managed-instance-dashboard",
   "displayName": "Managed Instance Dashboard",
   "description": "Managed Instance Dashboard",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "publisher": "Microsoft",
   "preview": true,
   "engines": {
@@ -265,7 +265,7 @@
         "container": {
           "widgets-container": [
             {
-              "name": "Latest error log entries",
+              "name": "Error log entries",
               "gridItemConfig": {
                 "sizex": 4,
                 "sizey": 3
