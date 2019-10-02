@@ -286,6 +286,6 @@
   "dependencies": {},
   "devDependencies": {
     "vsce": "1.36.2",
-    "vscode": "^1.1.34"
+    "vscode": "^1.1.36"
   }
 }
