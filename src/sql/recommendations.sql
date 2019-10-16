@@ -26,7 +26,7 @@ select	name = 'MEMORY_PRESSURE' COLLATE Latin1_General_100_CI_AS,
 				ELSE 0
 			END / v.cntr_value )),0)
 		, state = 'Investigate' COLLATE Latin1_General_100_CI_AS
-		, script = 'N/A: Add more memory or find the queries that use most of memory.' COLLATE Latin1_General_100_CI_AS
+		, script = 'Add more memory or find the queries that use most of memory.' COLLATE Latin1_General_100_CI_AS
 		, details = CONCAT('Page life expectency ', v.cntr_value,
 						' is lower than ', (((300*l.cntr_value*8/1024)/1024)/4),
 						' on ', RTRIM(v.object_name),'. Check PAGEIOLATCH and RESOURCE_SEMAPHORE wait statistics to verify is the problem in memory usage.') COLLATE Latin1_General_100_CI_AS
@@ -195,9 +195,9 @@ select
 		[state] = 'Investigate' COLLATE Latin1_General_100_CI_AS,
         script = CASE wait_type
                     WHEN 'INSTANCE_LOG_RATE_GOVERNOR' THEN 'N/A: This is fixed resource limit.' 
-					WHEN 'WRITELOG' THEN 'On GP increase log file that is using a lot of IOPS.'
+					WHEN 'WRITELOG' THEN 'Increase log file that is using a lot of IOPS.'
                     WHEN 'RESOURCE_SEMAPHORE' THEN 'Optimize top memory consumers or add more cores/memory.'
-					ELSE 'On GP increase data file with IO pressure on General Purpose.'
+					ELSE 'Increase size of data file with IO pressure on General Purpose.'
                 END COLLATE Latin1_General_100_CI_AS,
 		details = CASE wait_type
                     WHEN 'INSTANCE_LOG_RATE_GOVERNOR' THEN 'Instance has log rate limit so it can catch-up all changes.'
