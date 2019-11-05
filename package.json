@@ -2,7 +2,7 @@
   "name": "managed-instance-dashboard",
   "displayName": "Managed Instance Dashboard",
   "description": "Managed Instance Dashboard",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "publisher": "Microsoft",
   "preview": true,
   "engines": {
@@ -69,6 +69,17 @@
               },
               "container": {
                 "managed-instance-error-log-container": {}
+              }
+            },
+            {
+              "id": "managed-instance-backups",
+              "title": "Scheduled backups",
+              "icon": {
+                "light": "./src/media/scheduled_backups.svg",
+                "dark": "./src/media/scheduled_backups_inverse.svg"
+              },
+              "container": {
+                "managed-instance-backup-container": {}
               }
             }
           ]
@@ -164,6 +175,20 @@
         }
       },
       {
+        "id": "mi-backup-logs",
+        "contrib": {
+          "type": {
+            "table": {
+              "dataDirection": "horizontal",
+              "columnsAsLabels": false,
+              "labelFirstColumn": false,
+              "legendPosition": "top"
+            }
+          },
+          "queryFile": "./src/sql/backups.sql"
+        }
+      },
+      {
         "id": "mi-error-logs",
         "contrib": {
           "type": {
@@ -183,6 +208,16 @@
         "id": "managed-instance-monitoring-container",
         "container": {
           "widgets-container": [
+            {
+              "name": "Resource usage",
+              "gridItemConfig": {
+                "sizex": 3,
+                "sizey": 1
+              },
+              "widget": {
+                "mi-resource-usage": {}
+              }
+            },
             {
               "name": "Properties",
               "gridItemConfig": {
@@ -211,16 +246,6 @@
               },
               "widget": {
                 "mi-storage-usage-azure": {}
-              }
-            },
-            {
-              "name": "Resource usage",
-              "gridItemConfig": {
-                "sizex": 3,
-                "sizey": 1
-              },
-              "widget": {
-                "mi-resource-usage": {}
               }
             }
           ]
@@ -255,6 +280,23 @@
               },
               "widget": {
                 "mi-recommendations": {}
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "managed-instance-backup-container",
+        "container": {
+          "widgets-container": [
+            {
+              "name": "Backups",
+              "gridItemConfig": {
+                "sizex": 4,
+                "sizey": 3
+              },
+              "widget": {
+                "mi-backup-logs": {}
               }
             }
           ]
