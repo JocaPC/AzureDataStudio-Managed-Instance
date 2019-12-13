@@ -2,7 +2,7 @@
   "name": "managed-instance-dashboard",
   "displayName": "Managed Instance Dashboard",
   "description": "Managed Instance Dashboard",
-  "version": "0.3.9",
+  "version": "0.4.0",
   "publisher": "Microsoft",
   "preview": true,
   "engines": {
@@ -31,8 +31,8 @@
               "id": "managed-instance-monitoring",
               "title": "Properties",
               "icon": {
-                "light": "./src/media/monitor.svg",
-                "dark": "./src/media/monitor_inverse.svg"
+                "light": "./src/media/properties.svg",
+                "dark": "./src/media/properties_inverse.svg"
               },
               "container": {
                 "managed-instance-monitoring-container": {}
@@ -42,8 +42,8 @@
               "id": "managed-instance-recommendations",
               "title": "Recommendations",
               "icon": {
-                "light": "./src/media/support.svg",
-                "dark": "./src/media/support_inverse.svg"
+                "light": "./src/media/tuning_recommendations.svg",
+                "dark": "./src/media/tuning_recommendations_inverted.svg"
               },
               "container": {
                 "managed-instance-recommendations-container": {}
@@ -53,8 +53,8 @@
               "id": "managed-instance-health",
               "title": "Replicas",
               "icon": {
-                "light": "./src/media/replicas.svg",
-                "dark": "./src/media/replicas_inverse.svg"
+                "light": "./src/media/database_replicas.svg",
+                "dark": "./src/media/database_replicas_inverted.svg"
               },
               "container": {
                 "managed-instance-health-container": {}
@@ -64,8 +64,8 @@
               "id": "managed-instance-logs",
               "title": "Logs",
               "icon": {
-                "light": "./src/media/health.svg",
-                "dark": "./src/media/health_inverse.svg"
+                "light": "./src/media/error_log.svg",
+                "dark": "./src/media/error_log_inverted.svg"
               },
               "container": {
                 "managed-instance-error-log-container": {}
@@ -75,8 +75,8 @@
               "id": "managed-instance-backups",
               "title": "Scheduled backups",
               "icon": {
-                "light": "./src/media/scheduled_backups.svg",
-                "dark": "./src/media/scheduled_backups_inverse.svg"
+                "light": "./src/media/database_log.svg",
+                "dark": "./src/media/database_log_inverted.svg"
               },
               "container": {
                 "managed-instance-backup-container": {}
