@@ -34,9 +34,9 @@ EXEC sys.xp_readerrorlog 0, 1, @p1 = N'Backup(';
 
 -- Return filtered log
 SELECT TOP 2000 el.LogDate,
-       LogText = IIF(d.name IS NULL, el.LogText, REPLACE(el.LogText, d.physical_database_name, d.name))
+       LogText = IIF(d.name IS NULL, el.LogText, REPLACE(el.LogText COLLATE Latin1_General_100_CI_AS, d.physical_database_name, d.name))
 FROM @ErrorLog AS el
-LEFT JOIN sys.databases d ON el.LogText LIKE '%'+d.physical_database_name+'%'
+LEFT JOIN sys.databases d ON el.LogText COLLATE Latin1_General_100_CI_AS LIKE '%'+d.physical_database_name+'%'
 WHERE SUBSTRING(el.LogText, 1, 7) = N'Backup('
 and d.name not in ('master', 'model')
 ORDER BY el.LogDate DESC,

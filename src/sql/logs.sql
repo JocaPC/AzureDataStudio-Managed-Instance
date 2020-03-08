@@ -214,9 +214,9 @@ END;
 -- Return filtered log
 SELECT TOP 200 el.LogDate,
        el.ProcessInfo,
-       LogText = IIF(d.name IS NULL, el.LogText, REPLACE(el.LogText, d.physical_database_name, d.name))
+       LogText = IIF(d.name IS NULL, el.LogText, REPLACE(el.LogText COLLATE Latin1_General_100_CI_AS, d.physical_database_name, d.name))
 FROM @ErrorLog AS el
-LEFT JOIN sys.databases d ON el.LogText LIKE '%'+d.physical_database_name+'%'
+LEFT JOIN sys.databases d ON el.LogText COLLATE Latin1_General_100_CI_AS LIKE '%'+d.physical_database_name+'%'
 WHERE SUBSTRING(el.LogText, 1, 7) <> N'Backup('
 AND SUBSTRING(el.LogText, 1, 21) <> N' [RotateDatabaseKeys]'
 AND SUBSTRING(el.LogText, 1, 58) <> N'[AzureKeyVaultClientHelper::CheckDbAkvWrapUnwrap]: Skipped'
