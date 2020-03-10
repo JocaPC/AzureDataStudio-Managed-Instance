@@ -29,3 +29,4 @@ tsconfig.json
 *.exe
 *.dat
 gulpfile.js
+images/managed_instance.png
