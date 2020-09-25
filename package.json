@@ -25,6 +25,7 @@
         "id": "Managed-Instance",
         "title": "Managed Instance",
         "description": "This extension shows useful reports for Azure SQL Database Managed Instance.",
+        "when": "connectionProvider == 'MSSQL' && mssql:engineedition == 8",
         "container": {
           "nav-section": [
             {
