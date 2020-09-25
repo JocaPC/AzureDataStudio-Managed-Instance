@@ -200,7 +200,7 @@ select
 					ELSE 'Increase size of data file with IO pressure on General Purpose.'
                 END COLLATE Latin1_General_100_CI_AS,
 		details = CASE wait_type
-                    WHEN 'INSTANCE_LOG_RATE_GOVERNOR' THEN 'Instance has log rate limit so it can catch-up all changes.'
+                    WHEN 'INSTANCE_LOG_RATE_GOVERNOR' THEN 'Instance and database have log rate limit so they can catch-up and backup all changes.'
                     WHEN 'WRITELOG' THEN 'Queries are waiting log entries to be written.'
 					WHEN 'RESOURCE_SEMAPHORE' THEN 'It is possible that some queries causing memory presure and trying to aquire the page.'
                     ELSE 'Instance may not succeed to save the memory pages to the data files as they are changed, or has problem fetching the missing pages in memory.'
