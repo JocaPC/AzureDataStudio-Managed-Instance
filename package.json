@@ -210,16 +210,6 @@
         "container": {
           "widgets-container": [
             {
-              "name": "Resource usage",
-              "gridItemConfig": {
-                "sizex": 3,
-                "sizey": 1
-              },
-              "widget": {
-                "mi-resource-usage": {}
-              }
-            },
-            {
               "name": "Properties",
               "gridItemConfig": {
                 "sizex": 1,
@@ -248,7 +238,17 @@
               "widget": {
                 "mi-storage-usage-azure": {}
               }
-            }
+			},
+			{
+				"name": "Resource usage",
+				"gridItemConfig": {
+				  "sizex": 3,
+				  "sizey": 1
+				},
+				"widget": {
+				  "mi-resource-usage": {}
+				}
+			}
           ]
         }
       },

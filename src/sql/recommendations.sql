@@ -10,7 +10,7 @@ reason = (CAST(count(*) AS VARCHAR(6)) + ' VLF in ' + DB_NAME(mf.database_id)) C
 score = CAST(1-EXP(-count(*)/100.) AS NUMERIC(6,2))*100,
 [state] = 'Mitigate' COLLATE Latin1_General_100_CI_AS,
 script = CONCAT("USE [", DB_NAME(mf.database_id),"];DBCC SHRINKFILE (N'",name,"', 1, TRUNCATEONLY);") COLLATE Latin1_General_100_CI_AS,
-details = (CAST(count(*) AS VARCHAR(6)) + ' VLF can cause unavailability of ' + DB_NAME(mf.database_id) + " after failover. Schrink log file using 'https://github.com/Microsoft/tigertoolbox/tree/master/Fixing-VLFs'") COLLATE Latin1_General_100_CI_AS
+details = (CAST(count(*) AS VARCHAR(6)) + ' VLF can cause unavailability of ' + DB_NAME(mf.database_id) + " after failover. Shrink log file using 'https://github.com/Microsoft/tigertoolbox/tree/master/Fixing-VLFs'") COLLATE Latin1_General_100_CI_AS
 from sys.master_files mf
 cross apply sys.dm_db_log_info(mf.database_id) li
 where li.file_id = mf.file_id

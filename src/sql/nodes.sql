@@ -49,7 +49,7 @@ SELECT
 	[Is local] = is_local,
 	state = synchronization_state_desc,
 	[Lag (sec)] = secondary_lag_seconds,
-	[Send rate (kbps)] = log_send_rate,
-	[Redo rate (kbps)] = redo_rate
+	[Send rate (mbps)] = log_send_rate/1024,
+	[Redo rate (mbps)] = redo_rate/1024
 	FROM nodes_progress_size
 ORDER BY db_name ASC, is_primary_replica DESC;
