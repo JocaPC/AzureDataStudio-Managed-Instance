@@ -10,3 +10,9 @@ Here is a list of some of the available reports.
 
 <img src="https://raw.githubusercontent.com/JocaPC/AzureDataStudio-Managed-Instance/master/images/managed_instance.png" alt="Managed Instance" style="width:480px;"/>
 
+## License
+
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+Licensed under the [Source EULA](https://raw.githubusercontent.com/JocaPC/AzureDataStudio-Managed-Instance/master/LICENSE.txt).
+
