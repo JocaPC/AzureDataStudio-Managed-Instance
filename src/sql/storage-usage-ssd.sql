@@ -6,15 +6,22 @@ sku as
 	where start_time > DATEADD(mi, -7, GETUTCDATE())
     order by start_time desc) ,
 volumes as (
-SELECT	Storage = CASE WHEN volume_mount_point = 'http://' THEN 'Remote storage'
-                        ELSE 'Local SSD'
-                    END,
+SELECT	Storage = CASE
+                    WHEN f.physical_name LIKE 'C:\ManagedDisks%' THEN 'Premium Managed Disks'
+                    WHEN f.physical_name LIKE 'https%' THEN 'Premium Page Blobs'
+                    ELSE 'Local SSD'
+                  END,
 		[GB Used] = CAST(MIN(total_bytes / 1024. / 1024 / 1024) AS NUMERIC(8,1)),
 		[GB Available] = CAST(MIN(available_bytes / 1024. / 1024 / 1024) AS NUMERIC(8,1)),
 		[GB Total] = CAST(MIN((total_bytes+available_bytes) / 1024. / 1024 / 1024) AS NUMERIC(8,1))
 FROM sys.master_files AS f
 CROSS APPLY sys.dm_os_volume_stats(f.database_id, f.file_id)
-GROUP BY volume_mount_point)
+GROUP BY
+    CASE
+        WHEN f.physical_name LIKE 'C:\ManagedDisks%' THEN 'Premium Managed Disks'
+        WHEN f.physical_name LIKE 'https%' THEN 'Premium Page Blobs'
+        ELSE 'Local SSD'
+    END)
 SELECT [ ] = case 
                 when sku.service_tier = 'GeneralPurpose' then 'TempDB'
                 else 'TempDB, user and system databases'

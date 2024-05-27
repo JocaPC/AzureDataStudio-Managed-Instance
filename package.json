@@ -212,7 +212,7 @@
             {
               "name": "Properties",
               "gridItemConfig": {
-                "sizex": 1,
+                "sizex": 2,
                 "sizey": 1
               },
               "widget": {
@@ -230,7 +230,7 @@
               }
             },
             {
-              "name": "Azure Premium Disk storage",
+              "name": "Azure Remote storage",
               "gridItemConfig": {
                 "sizex": 1,
                 "sizey": 1
@@ -242,7 +242,7 @@
 			{
 				"name": "Resource usage",
 				"gridItemConfig": {
-				  "sizex": 3,
+				  "sizex": 4,
 				  "sizey": 1
 				},
 				"widget": {
