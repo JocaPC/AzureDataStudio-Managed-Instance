@@ -20,6 +20,10 @@
     "commands": [],
     "views": {},
     "menus": {},
+    "icon": {
+      "light": "./images/ManagedInstanceLogo.png",
+      "dark": "./images/ManagedInstanceLogo.png"
+    },
     "dashboard.tabs": [
       {
         "id": "Managed-Instance",
